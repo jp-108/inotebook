@@ -3,23 +3,88 @@ import React, {createContext, useState} from "react";
 export const NoteContext = createContext();
 
 const NoteState = (props)=>{
-    let user = {
-        name:"Jay",
-        email:"jay@gmail.com"
-    }
-    
-    const [state, setState] = useState(user)
+  let host = "http://localhost:5400/route"
+  const initialNote =[];
 
-    const update=()=>{
-        setTimeout(() => {
-            setState ({
-                name:"JP",
-                email:"jp@gmail.com"
-            })   
-        }, 3000);
+  const [notes, setNotes] = useState(initialNote)
+
+    let usernote = async()=>{ 
+      let note = await fetch(`${host}/fetchnotes`,{
+      method:"get",
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNmYTFkYzEzYWU5YmE0OTU5YjEzMWU3In0sImlhdCI6MTY3NzM0NDc4N30.Yv571kfmShzsO5xtwljOC2xz5dLao2h_6x2EPEuB7G4"
+      }
+    })
+   note = await note.json();
+    setNotes(note)
+  }
+
+    
+    // Add Note
+      const addNote =async(title, description, tag)=>{
+        let note = await fetch(`${host}/addnotes`,{
+          method:"post",
+          body: JSON.stringify({title, description, tag}),
+          headers:{
+            "Content-Type": "application/json",
+            "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNmYTFkYzEzYWU5YmE0OTU5YjEzMWU3In0sImlhdCI6MTY3NzM0NDc4N30.Yv571kfmShzsO5xtwljOC2xz5dLao2h_6x2EPEuB7G4"
+          }
+        }
+        )
+        note =await note.json(); 
+        setNotes(notes.concat(note))
+      }
+
+    // Delete Note
+ const deleteNote =  async (id)=>{
+  let note = await fetch(`${host}/delete/${id}`,{
+    method:"delete",
+    body: JSON.stringify({id}),
+    headers:{
+      "Content-Type": "application/json",
+      "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNmYTFkYzEzYWU5YmE0OTU5YjEzMWU3In0sImlhdCI6MTY3NzM0NDc4N30.Yv571kfmShzsO5xtwljOC2xz5dLao2h_6x2EPEuB7G4"
     }
+  }
+  )
+    // eslint-disable-next-line
+    note =await note.json();
+    const newNote = (notes.filter((note)=>{return note._id !== id}))
+    setNotes(newNote)  
+      }
+
+    // Edit Note
+
+    const editNote = async(id, title, description, tag)=>{
+      let note = await fetch(`${host}/update/${id}`,{
+        method:"put",
+        body: JSON.stringify({title, description, tag}),
+        headers:{
+          "Content-Type": "application/json",
+          "Authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNmYTFkYzEzYWU5YmE0OTU5YjEzMWU3In0sImlhdCI6MTY3NzM0NDc4N30.Yv571kfmShzsO5xtwljOC2xz5dLao2h_6x2EPEuB7G4"
+        }
+      }
+      )
+      // eslint-disable-next-line
+      note =await note.json();
+      for (let index = 0; index < notes.length; index++) {
+        const element = notes[index];
+        if(element._id===id){
+          element.title=title;
+          element.description=description;
+          element.tag=tag;
+          break;
+        }
+      }
+      const newNote =  JSON.parse(JSON.stringify(notes)) 
+      //const newNote = (notes.filter((note)=>{return note})) <== this can also work
+      setNotes(newNote) 
+      console.log(newNote)
+
+    }
+
     return(
-        <NoteContext.Provider value={{state, update}}>
+        <NoteContext.Provider value={{notes, addNote, deleteNote, editNote, usernote}}>
             {props.children}
         </NoteContext.Provider>
     )
