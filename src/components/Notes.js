@@ -5,6 +5,7 @@ import NoteItem from "./NoteItem";
 import EditModal from "./EditModal";
 import { useNavigate } from "react-router-dom";
 
+
 function Notes() {
   const ref = useRef(null);
   const context = useContext(NoteContext);
@@ -17,7 +18,7 @@ function Notes() {
       navigate("/login")
     }else{
       usernote();
-      navigate("/home")
+      navigate("/")
     }
     // eslint-disable-next-line
   }, []);
@@ -42,7 +43,7 @@ function Notes() {
       </span>
 
       <h1 className="my-3">Notes</h1>
-      <div className="row">
+      <div className="row" >
         {notes.length===0 && <div className="container">No Notes Available</div>}
         {notes.map((notes, index) => {
           return (
